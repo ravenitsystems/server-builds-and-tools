@@ -64,3 +64,48 @@ dnf install -y nano wget bind-utils net-tools git zip unzip tar mc
 ```
 dnf update -y
 ```
+
+### Finally reboot so any kernel update loads
+```
+reboot
+```
+
+
+
+## Add an administrator user
+
+It is very important you have at least one admin user (wheel group) because the steps after this will amongst other things prevent root logins 
+
+### Create your user and give it a password
+```
+adduser <username>
+
+usermod -aG wheel <username>
+
+passwd raven
+```
+
+### Add a public key to authenticate with no password
+
+```
+mkdir /home/<username>/.ssh
+
+cat >/home/<username>/.ssh/authorized_keys <<EOL
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDZYBdHXE8G2YvjTpDCJT674vasNTXMYu0v4r93KrtZFAzPimDcZ6aD2sVtWyxPrg9NVjKA+WQKgXVcpsU/Piz2UcP3p7bycp5pkOmmuAD5iVnvhd9ngu9TXHLFFKeO7Bz0vEfS9N61+lvj/k+oDNxg8uaeD0dF9pRiktqrm/j1ZSJ5XkERvQnYVETAZrA2UkgWiid3Gj4AdO0Uf9a5e1U7/fGIomn0boh+GC7tcgGu8C6U/k40Th1gmMIOiNdaCCnNjL7oAiF15jL2QjHqz3vpD2EU/Su3qtSl9/8oECydDPHjse7tKFqqK8ndhOwaQcqnL5Zjvomrq6KWterYEW5tbAI+6KF69DOorHZ0mbWQsKqxFUsv1fGQCWvEz1L0V8KFBq0nOTzjl6i175zHykvUANdfFbQBchcoV7aIj3mN1Cbws+A3nNre1t5AMhrGYNH4l0JEPgMy7y5pyEGWg9n6GQCAsNL2vDt3HgPBT3xTFs6N+4ni8MjCQKUVXxhktEV3BuuqnTeY99Z+yImnKtUXo2YLYjdYZgoSX4PR7gZHswJ3eTTDyMgRaqU+BRmzREckRAgoKo2aKQvOaJjpvzXCX5K8MTPsgwBEWJjPNXQVw/dztoj+zV7sFIJq7s6Tb4HGCD0MWUSbqRF7hvDTsBRHxpVB+3s/1Utslq+hr6DCzw== ft-nashley-06-25
+EOL
+
+chown -R <username>:<username> /home/<username>
+
+chmod 700 /home/<username>/.ssh
+
+chmod 600 /home/<username>/.ssh/authorized_keys
+```
+
+### Test your admin user (IMPORTANT)
+
+Now you have your admin user you need to test that you can sign in via SSH using your key (no password). 
+
+- Can you sign in via SSH using your key (no password)
+- Can you run a sudo command when entering your password
+
+Once you are sure you can do both actions on the list you can proceed to the hardening step
