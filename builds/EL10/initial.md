@@ -65,6 +65,52 @@ dnf install -y nano wget bind-utils net-tools git zip unzip tar mc
 dnf update -y
 ```
 
+### Install anti virus software
+```
+dnf install -y clamav clamd clamav-freshclam
+
+freshclam
+
+/* BROKEN */
+cat >/etc/freshclam.conf <<EOL
+DatabaseMirror database.clamav.net
+EOL
+
+/* BROKEN */
+cat >/etc/clamd.d/scan.conf <<EOL
+DatabaseDirectory /var/lib/clamav
+LocalSocket /run/clamd.scan/clamd.sock
+FixStaleSocket true
+User clamupdate
+LogFile /var/log/clamd.scan
+LogFileMaxSize 2M
+LogTime yes
+LogVerbose no
+ScanMail yes
+ScanArchive yes
+ArchiveBlockEncrypted no
+MaxFileSize 100M
+MaxScanSize 500M
+MaxRecursion 16
+MaxFiles 10000
+EOL
+
+mkdir -p /run/clamd.scan
+
+chown clamupdate:clamupdate /run/clamd.scan
+
+chmod 750 /run/clamd.scan
+
+systemctl start clamd@scan
+
+systemctl enable clamd@scan
+
+systemctl enable clamav-freshclam
+
+systemctl start clamav-freshclam
+
+```
+
 ### Finally reboot so any kernel update loads
 ```
 reboot
@@ -91,7 +137,7 @@ passwd raven
 mkdir /home/<username>/.ssh
 
 cat >/home/<username>/.ssh/authorized_keys <<EOL
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDZYBdHXE8G2YvjTpDCJT674vasNTXMYu0v4r93KrtZFAzPimDcZ6aD2sVtWyxPrg9NVjKA+WQKgXVcpsU/Piz2UcP3p7bycp5pkOmmuAD5iVnvhd9ngu9TXHLFFKeO7Bz0vEfS9N61+lvj/k+oDNxg8uaeD0dF9pRiktqrm/j1ZSJ5XkERvQnYVETAZrA2UkgWiid3Gj4AdO0Uf9a5e1U7/fGIomn0boh+GC7tcgGu8C6U/k40Th1gmMIOiNdaCCnNjL7oAiF15jL2QjHqz3vpD2EU/Su3qtSl9/8oECydDPHjse7tKFqqK8ndhOwaQcqnL5Zjvomrq6KWterYEW5tbAI+6KF69DOorHZ0mbWQsKqxFUsv1fGQCWvEz1L0V8KFBq0nOTzjl6i175zHykvUANdfFbQBchcoV7aIj3mN1Cbws+A3nNre1t5AMhrGYNH4l0JEPgMy7y5pyEGWg9n6GQCAsNL2vDt3HgPBT3xTFs6N+4ni8MjCQKUVXxhktEV3BuuqnTeY99Z+yImnKtUXo2YLYjdYZgoSX4PR7gZHswJ3eTTDyMgRaqU+BRmzREckRAgoKo2aKQvOaJjpvzXCX5K8MTPsgwBEWJjPNXQVw/dztoj+zV7sFIJq7s6Tb4HGCD0MWUSbqRF7hvDTsBRHxpVB+3s/1Utslq+hr6DCzw== ft-nashley-06-25
+<your public key>
 EOL
 
 chown -R <username>:<username> /home/<username>
