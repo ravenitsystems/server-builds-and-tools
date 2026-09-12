@@ -66,34 +66,13 @@ dnf update -y
 ```
 
 ### Install anti virus software
+
+Config files are `/etc/freshclam.conf` and `/etc/clamd.d/scan.conf`
+
 ```
 dnf install -y clamav clamd clamav-freshclam
 
 freshclam
-
-/* BROKEN */
-cat >/etc/freshclam.conf <<EOL
-DatabaseMirror database.clamav.net
-EOL
-
-/* BROKEN */
-cat >/etc/clamd.d/scan.conf <<EOL
-DatabaseDirectory /var/lib/clamav
-LocalSocket /run/clamd.scan/clamd.sock
-FixStaleSocket true
-User clamupdate
-LogFile /var/log/clamd.scan
-LogFileMaxSize 2M
-LogTime yes
-LogVerbose no
-ScanMail yes
-ScanArchive yes
-ArchiveBlockEncrypted no
-MaxFileSize 100M
-MaxScanSize 500M
-MaxRecursion 16
-MaxFiles 10000
-EOL
 
 mkdir -p /run/clamd.scan
 
@@ -108,7 +87,6 @@ systemctl enable clamd@scan
 systemctl enable clamav-freshclam
 
 systemctl start clamav-freshclam
-
 ```
 
 ### Finally reboot so any kernel update loads
@@ -128,7 +106,7 @@ adduser <username>
 
 usermod -aG wheel <username>
 
-passwd raven
+passwd <username>
 ```
 
 ### Add a public key to authenticate with no password
